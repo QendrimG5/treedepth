@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 import pandas as pd
+import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
@@ -70,7 +71,9 @@ node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'le
 
 new_instance_type = 'heur'
 
-with ThreadPoolExecutor() as executor:
+max_threads = multiprocessing.cpu_count()  # get the number of cores
+
+with ThreadPoolExecutor(max_workers=max_threads) as executor:  # using the max threads
     data = list(executor.map(process_instance, range(1, 200)))
 
 print("Finished all instances.")
