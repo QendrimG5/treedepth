@@ -74,7 +74,7 @@ new_instance_type = 'heur'
 max_threads = multiprocessing.cpu_count()  # get the number of cores
 
 with ThreadPoolExecutor(max_workers=max_threads) as executor:  # using the max threads
-    data = list(executor.map(process_instance, range(1, 200)))
+    data = list(executor.map(process_instance, range(1, 201)))
 
 print("Finished all instances.")
 
