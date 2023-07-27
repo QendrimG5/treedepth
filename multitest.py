@@ -69,7 +69,7 @@ new_instance_type = 'heur'
 
 data = []
 try:
-    with ThreadPoolExecutor(max_workers=44) as executor:
+    with ThreadPoolExecutor(max_workers=40) as executor:
         data = list(executor.map(process_instance, range(1, 201)))
     print("Finished all instances.")
 finally:
