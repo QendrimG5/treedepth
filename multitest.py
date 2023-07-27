@@ -67,8 +67,8 @@ node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'le
 
 new_instance_type = 'heur'
 
-with ThreadPoolExecutor(max_workers=40) as executor:
-    data = list(executor.map(process_instance, range(1, 51)))
+with ThreadPoolExecutor(max_workers=44) as executor:
+    data = list(executor.map(process_instance, range(1, 20)))
 
 print("Finished all instances.")
 
