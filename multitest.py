@@ -67,20 +67,19 @@ node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'le
 
 new_instance_type = 'heur'
 
-with ThreadPoolExecutor(max_workers=44) as executor:
-    data = list(executor.map(process_instance, range(1, 201)))
+data = []
+try:
+    with ThreadPoolExecutor(max_workers=44) as executor:
+        data = list(executor.map(process_instance, range(1, 201)))
+    print("Finished all instances.")
+finally:
+    df = pd.DataFrame(data, columns=["Instance"] + [f"Execution {i+1}" for i in range(10)])
 
-print("Finished all instances.")
+    # Add node_type_selection_probability to the end of DataFrame
+    df_probabilities = pd.DataFrame([node_type_selection_probability], index=['Node Probabilities'])
+    df = pd.concat([df, df_probabilities])
 
-df = pd.DataFrame(data, columns=["Instance"] +
-                  [f"Execution {i+1}" for i in range(10)])
-
-# Add node_type_selection_probability to the end of DataFrame
-df_probabilities = pd.DataFrame(
-    [node_type_selection_probability], index=['Node Probabilities'])
-df = pd.concat([df, df_probabilities])
-
-# current date and time as a string
-timestamp = datetime.now().strftime('%Y%m%d%H%M')
-excel_file = f"exectest_{timestamp}.xlsx"  # dynamic Excel file name
-df.to_excel(excel_file, index=False)
+    # current date and time as a string
+    timestamp = datetime.now().strftime('%Y%m%d%H%M')
+    excel_file = f"exectest_{timestamp}.xlsx"  # dynamic Excel file name
+    df.to_excel(excel_file, index=False)
