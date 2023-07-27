@@ -5,7 +5,6 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
-
 def update_script(file_name, new_values, new_instance_type, new_start_instance_index):
     with open(file_name, 'r') as file:
         data = file.read()
@@ -28,7 +27,6 @@ def update_script(file_name, new_values, new_instance_type, new_start_instance_i
         file.write(data)
 
     return new_file_name
-
 
 def process_instance(new_start_instance_index):
     print(f"\nStart processing instance number {new_start_instance_index}")
@@ -64,13 +62,12 @@ def process_instance(new_start_instance_index):
 
     return [instance] + results
 
-
 node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'leafs': 10, 'root': 10,
                                    'top': 10, 'bottom': 10, 'level': 10, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
 
 new_instance_type = 'heur'
 
-with ThreadPoolExecutor() as executor:
+with ThreadPoolExecutor(max_workers=40) as executor:
     data = list(executor.map(process_instance, range(1, 101)))
 
 print("Finished all instances.")
