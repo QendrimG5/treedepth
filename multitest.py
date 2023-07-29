@@ -2,9 +2,8 @@ import os
 import re
 import subprocess
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-import itertools
 
 def update_script(file_name, new_values, new_instance_type, new_start_instance_index):
     with open(file_name, 'r') as file:
@@ -70,22 +69,10 @@ new_instance_type = 'heur'
 
 data = []
 try:
-    with ThreadPoolExecutor(max_workers=44) as executor:
-        instances = itertools.cycle(range(1, 201))  # Infinite iterator over instances
-        futures = {executor.submit(process_instance, next(instances)) for _ in range(44)}  # Initial futures
-
-        while futures:
-            done, futures = as_completed(futures, return_when='FIRST_COMPLETED').__next__()  # Wait for the first future to complete
-            try:
-                data.append(done.result())  # Save the result
-                if len(futures) < 44:  # If there's room for more futures
-                    futures.add(executor.submit(process_instance, next(instances)))  # Add a new future
-            except Exception as exc:
-                print(f"Generated an exception: {exc}")
+    with ThreadPoolExecutor(max_workers=40) as executor:
+        data = list(executor.map(process_instance, range(1, 201)))
+    print("Finished all instances.")
 finally:
-    # Collect results
-    data = [result for result in data]
-
     df = pd.DataFrame(data, columns=["Instance"] + [f"Execution {i+1}" for i in range(10)])
 
     # Add node_type_selection_probability to the end of DataFrame
