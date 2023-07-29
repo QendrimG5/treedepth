@@ -58,7 +58,7 @@ def process_instance(new_start_instance_index):
         if match is None:
             print(
                 f"No match found in the output for instance number {new_start_instance_index}")
-            results.append(None)  # Use None for instances with no valid result
+            results.append('timeout')  # Use 'timeout' for instances with no valid result
             continue
         instance = match.group(1)
         tree_depth = int(match.group(2))
@@ -72,9 +72,9 @@ def process_instance(new_start_instance_index):
 
     # Fill up the results list to have 10 elements
     while len(results) < 10:
-        results.append(None)
+        results.append('timeout')
 
-    return {"Instance": f"Instance {new_start_instance_index}"} + {f"Execution {i+1}": result for i, result in enumerate(results)}
+    return {"Instance": f"Instance {new_start_instance_index}", **{f"Execution {i+1}": result for i, result in enumerate(results)}}
 
 node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'leafs': 10, 'root': 10,
                                    'top': 10, 'bottom': 10, 'level': 10, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
@@ -86,7 +86,10 @@ try:
     with ThreadPoolExecutor(max_workers=44) as executor:
         future_to_instance = {executor.submit(process_instance, i): i for i in range(1, 45)}
         for future in as_completed(future_to_instance):
-            instance_data = future.result()
+            try:
+                instance_data = future.result()
+            except Exception as exc:
+                instance_data = {"Instance": f"Instance {future_to_instance[future]}", "Error": str(exc)}
             data.append(instance_data)
 finally:
     # Convert list of dictionaries to DataFrame and save to Excel
