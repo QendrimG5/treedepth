@@ -40,7 +40,7 @@ def process_instance(new_start_instance_index):
         print(f"Executing command: python3 {new_script} {instance_name}")
         try:
             process = subprocess.run(
-                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=1860)
+                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=6)
             output = process.stdout
         except subprocess.TimeoutExpired:
             print("Command timed out after 30 minutes.")
@@ -98,7 +98,7 @@ atexit.register(save_data)
 
 try:
     with ThreadPoolExecutor(max_workers=48) as executor:
-        future_to_instance = {executor.submit(process_instance, i): i for i in range(1, 201)}
+        future_to_instance = {executor.submit(process_instance, i): i for i in range(1, 105)}
         for future in as_completed(future_to_instance):
             try:
                 instance_data = future.result()
