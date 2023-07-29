@@ -39,7 +39,7 @@ def process_instance(new_start_instance_index):
         print(f"Executing command: python3 {new_script} {instance_name}")
         try:
             process = subprocess.run(
-                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=1800)
+                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=10)
             output = process.stdout
         except subprocess.TimeoutExpired:
             print("Command timed out after 30 minutes.")
