@@ -36,11 +36,11 @@ def process_instance(new_start_instance_index):
         new_script = update_script(
             'ils_solver.py', node_type_selection_probability, new_instance_type, new_start_instance_index)
 
-        instance_name = f"--heur__{new_start_instance_index:03d}.gr"
-        print(f"Executing command: python3 {new_script} {instance_name}")
+        instance_name = f"heur__{new_start_instance_index:03d}.gr"
+        print(f"Executing command: python3 {new_script} --{instance_name}")
         try:
             process = subprocess.run(
-                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=6)
+                ["python3", new_script, "--"+instance_name], capture_output=True, text=True, timeout=6)
             output = process.stdout
         except subprocess.TimeoutExpired:
             print("Command timed out after 30 minutes.")
@@ -67,7 +67,7 @@ def process_instance(new_start_instance_index):
 
         print(
             f"Completed execution number {i+1} for instance number {new_start_instance_index}")
-    
+
     # remove the script file after use
     os.remove(new_script)
 
@@ -75,7 +75,7 @@ def process_instance(new_start_instance_index):
     while len(results) < 10:
         results.append('timeout')
 
-    return {"Instance": f"Instance {new_start_instance_index}", **{f"Execution {i+1}": result for i, result in enumerate(results)}}
+    return {"Instance": instance_name, **{f"Execution {i+1}": result for i, result in enumerate(results)}}
 
 node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'leafs': 10, 'root': 10,
                                    'top': 10, 'bottom': 10, 'level': 10, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
