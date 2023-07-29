@@ -76,7 +76,7 @@ new_instance_type = 'heur'
 data = []
 try:
     with ThreadPoolExecutor(max_workers=44) as executor:
-        instances = itertools.cycle(range(1, 201))  # Infinite iterator over instances
+        instances = itertools.cycle(range(1, 45))  # Infinite iterator over instances
         futures = {executor.submit(process_instance, next(instances)) for _ in range(44)}  # Initial futures
 
         while futures:
