@@ -89,7 +89,7 @@ def save_data():
     df = pd.DataFrame(data)
     
     # current date and time as a string
-    timestamp = datetime.now().strftime('%Y%m%d%H%M')
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     excel_file = f"exectest_{timestamp}.xlsx"  # dynamic Excel file name
     df.to_excel(excel_file, index=False)
     print(f"Data saved to {excel_file}")
