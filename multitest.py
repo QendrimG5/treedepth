@@ -39,7 +39,7 @@ def process_instance(new_start_instance_index):
         print(f"Executing command: python3 {new_script} {instance_name}")
         try:
             process = subprocess.run(
-                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=7)
+                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=1860)
             output = process.stdout
         except subprocess.TimeoutExpired:
             print("Command timed out after 30 minutes.")
@@ -74,9 +74,7 @@ def process_instance(new_start_instance_index):
     while len(results) < 10:
         results.append('timeout')
 
-    return {"Instance": f"Instance {new_start_instance_index}", 
-            "Probabilities": str(node_type_selection_probability),  # Added probabilities
-            **{f"Execution {i+1}": result for i, result in enumerate(results)}}
+    return {"Instance": f"Instance {new_start_instance_index}", **{f"Execution {i+1}": result for i, result in enumerate(results)}}
 
 node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'leafs': 10, 'root': 10,
                                    'top': 10, 'bottom': 10, 'level': 10, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
@@ -93,9 +91,22 @@ try:
             except Exception as exc:
                 instance_data = {"Instance": f"Instance {future_to_instance[future]}", "Error": str(exc)}
             data.append(instance_data)
+            
+            # Save intermediate data to Excel
+            df = pd.DataFrame(data)
+            # current date and time as a string
+            timestamp = datetime.now().strftime('%Y%m%d%H%M')
+            excel_file = f"exectest_{timestamp}.xlsx"  # dynamic Excel file name
+            df.to_excel(excel_file, index=False)
+            print(f"Intermediate data saved to {excel_file}")
+            
 except Exception as e:
     print(f"Exception occurred: {str(e)}")
 finally:
+    # Add the probabilities as a final row in the DataFrame
+    prob_dict = {"Instance": "Probabilities", **node_type_selection_probability, **{f"Execution {i+1}": '' for i in range(10)}}
+    data.append(prob_dict)
+
     # Convert list of dictionaries to DataFrame and save to Excel
     df = pd.DataFrame(data)
     
@@ -103,4 +114,4 @@ finally:
     timestamp = datetime.now().strftime('%Y%m%d%H%M')
     excel_file = f"exectest_{timestamp}.xlsx"  # dynamic Excel file name
     df.to_excel(excel_file, index=False)
-    print(f"Data saved to {excel_file}")
+    print(f"Final data saved to {excel_file}")
