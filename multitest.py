@@ -2,7 +2,7 @@ import os
 import re
 import subprocess
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
 def update_script(file_name, new_values, new_instance_type, new_start_instance_index):
@@ -37,13 +37,22 @@ def process_instance(new_start_instance_index):
 
         instance_name = f"--heur__{new_start_instance_index:03d}.gr"
         print(f"Executing command: python3 {new_script} {instance_name}")
-        process = subprocess.run(
-            ["python3", new_script, instance_name], capture_output=True, text=True)
+        try:
+            process = subprocess.run(
+                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=1800)
+            output = process.stdout
+        except subprocess.TimeoutExpired:
+            print("Command timed out after 30 minutes.")
+            results.append('timeout')
+            continue
+        except Exception as exc:
+            print(f"Generated an exception: {exc}")
+            results.append('error')
+            continue
 
         print(f"Output for instance number {new_start_instance_index}:")
-        print(process.stdout)
+        print(output)
 
-        output = process.stdout
         match = re.search(
             r"The tree depth for instance '(.*?)' is '(.*?)'", output)
         if match is None:
@@ -69,10 +78,17 @@ new_instance_type = 'heur'
 
 data = []
 try:
-    with ThreadPoolExecutor(max_workers=40) as executor:
-        data = list(executor.map(process_instance, range(1, 201)))
-    print("Finished all instances.")
+    with ThreadPoolExecutor(max_workers=44) as executor:
+        future_to_instance = {executor.submit(process_instance, i): i for i in range(1, 45)}
+        for future in as_completed(future_to_instance):
+            instance = future_to_instance[future]
+            try:
+                data.append(future.result())
+            except Exception as exc:
+                print(f"Generated an exception for instance {instance}: {exc}")
+                data.append([instance, 'error'])
 finally:
+    # Convert list to DataFrame and save to Excel
     df = pd.DataFrame(data, columns=["Instance"] + [f"Execution {i+1}" for i in range(10)])
 
     # Add node_type_selection_probability to the end of DataFrame
