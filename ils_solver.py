@@ -118,14 +118,14 @@ class IteratedLocalSearch:
                     random.randrange(0, len(self.max_number_of_paths_list))]
 
             iteration_counter += 1
-            if time.time() - start_time > 5:  # If more than 30 mins have passed, save and break
+            if time.time() - start_time > 2:  # If more than 30 mins have passed, save and break
                 output_format_solution = self.convert_to_pace_format(best)
                 self.save_solution(
                     instance_name, output_format_solution, best.fitness)
                 break
 
             # Only terminate the loop if it's a forced termination and 30 mins have passed
-            if killer.exit_now and time.time() - start_time > 5:
+            if killer.exit_now and time.time() - start_time > 2:
                 output_format_solution = self.convert_to_pace_format(best)
                 self.save_solution(
                     instance_name, output_format_solution, best.fitness)
