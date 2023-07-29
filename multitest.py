@@ -38,8 +38,13 @@ def process_instance(new_start_instance_index):
 
         instance_name = f"--heur__{new_start_instance_index:03d}.gr"
         print(f"Executing command: python3 {new_script} {instance_name}")
-        process = subprocess.run(
-            ["python3", new_script, instance_name], capture_output=True, text=True)
+        try:
+            process = subprocess.run(
+                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=1860)
+        except subprocess.TimeoutExpired:
+            print("Process timed out after 31 minutes.")
+            results = ['timeout'] * 10
+            break  # break the loop since the process timed out
 
         print(f"Output for instance number {new_start_instance_index}:")
         print(process.stdout)
@@ -61,7 +66,7 @@ def process_instance(new_start_instance_index):
         # remove the script file after use
         os.remove(new_script)
 
-    return [instance] + results
+    return [instance_name] + results
 
 node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'leafs': 10, 'root': 10,
                                    'top': 10, 'bottom': 10, 'level': 10, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
