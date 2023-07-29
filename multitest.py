@@ -121,7 +121,7 @@ finally:
 
     # Append the probabilities DataFrame at the end
     df = pd.DataFrame(data)
-    df = df.append(df_prob, ignore_index=True)
+    df = df._append(df_prob, ignore_index=True)
 
     # current date and time as a string
     timestamp = datetime.now().strftime('%Y%m%d%H%M')
