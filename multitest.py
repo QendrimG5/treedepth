@@ -97,7 +97,7 @@ def save_data():
 atexit.register(save_data)
 
 try:
-    with ThreadPoolExecutor(max_workers=44) as executor:
+    with ThreadPoolExecutor(max_workers=48) as executor:
         future_to_instance = {executor.submit(process_instance, i): i for i in range(1, 201)}
         for future in as_completed(future_to_instance):
             try:
