@@ -39,7 +39,7 @@ def process_instance(new_start_instance_index):
         print(f"Executing command: python3 {new_script} {instance_name}")
         try:
             process = subprocess.run(
-                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=1)
+                ["python3", new_script, instance_name], capture_output=True, text=True, timeout=1800)
             output = process.stdout
         except subprocess.TimeoutExpired:
             print("Command timed out after 30 minutes.")
@@ -58,6 +58,7 @@ def process_instance(new_start_instance_index):
         if match is None:
             print(
                 f"No match found in the output for instance number {new_start_instance_index}")
+            results.append('error')
             continue
         instance = match.group(1)
         tree_depth = int(match.group(2))
@@ -69,6 +70,10 @@ def process_instance(new_start_instance_index):
         # remove the script file after use
         os.remove(new_script)
 
+    # Ensure that results always has a length of 10
+    while len(results) < 10:
+        results.append('error')
+
     return [instance] + results
 
 node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'leafs': 10, 'root': 10,
@@ -78,15 +83,15 @@ new_instance_type = 'heur'
 
 data = []
 try:
-    with ThreadPoolExecutor(max_workers=44) as executor:
-        future_to_instance = {executor.submit(process_instance, i): i for i in range(1, 45)}
+    with ThreadPoolExecutor(max_workers=40) as executor:
+        future_to_instance = {executor.submit(process_instance, i): i for i in range(1, 201)}
         for future in as_completed(future_to_instance):
             instance = future_to_instance[future]
             try:
                 data.append(future.result())
             except Exception as exc:
                 print(f"Generated an exception for instance {instance}: {exc}")
-                data.append([instance, 'error'])
+                data.append([instance] + ['error']*10)
 finally:
     # Convert list to DataFrame and save to Excel
     df = pd.DataFrame(data, columns=["Instance"] + [f"Execution {i+1}" for i in range(10)])
