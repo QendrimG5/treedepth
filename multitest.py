@@ -4,6 +4,7 @@ import subprocess
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+import atexit
 
 def update_script(file_name, new_values, new_instance_type, new_start_instance_index):
     with open(file_name, 'r') as file:
@@ -66,9 +67,9 @@ def process_instance(new_start_instance_index):
 
         print(
             f"Completed execution number {i+1} for instance number {new_start_instance_index}")
-
-        # remove the script file after use
-        os.remove(new_script)
+    
+    # remove the script file after use
+    os.remove(new_script)
 
     # Fill up the results list to have 10 elements
     while len(results) < 10:
@@ -82,6 +83,19 @@ node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'le
 new_instance_type = 'heur'
 
 data = []
+
+def save_data():
+    # Convert list of dictionaries to DataFrame
+    df = pd.DataFrame(data)
+    
+    # current date and time as a string
+    timestamp = datetime.now().strftime('%Y%m%d%H%M')
+    excel_file = f"exectest_{timestamp}.xlsx"  # dynamic Excel file name
+    df.to_excel(excel_file, index=False)
+    print(f"Data saved to {excel_file}")
+
+atexit.register(save_data)
+
 try:
     with ThreadPoolExecutor(max_workers=44) as executor:
         future_to_instance = {executor.submit(process_instance, i): i for i in range(1, 201)}
@@ -93,25 +107,24 @@ try:
             data.append(instance_data)
             
             # Save intermediate data to Excel
-            df = pd.DataFrame(data)
-            # current date and time as a string
-            timestamp = datetime.now().strftime('%Y%m%d%H%M')
-            excel_file = f"exectest_{timestamp}.xlsx"  # dynamic Excel file name
-            df.to_excel(excel_file, index=False)
-            print(f"Intermediate data saved to {excel_file}")
+            save_data()
             
 except Exception as e:
     print(f"Exception occurred: {str(e)}")
 finally:
+    # Save the final data to Excel
+    save_data()
+
     # Add the probabilities as a final row in the DataFrame
     prob_dict = {"Instance": "Probabilities", **node_type_selection_probability, **{f"Execution {i+1}": '' for i in range(10)}}
-    data.append(prob_dict)
+    df_prob = pd.DataFrame([prob_dict])
 
-    # Convert list of dictionaries to DataFrame and save to Excel
+    # Append the probabilities DataFrame at the end
     df = pd.DataFrame(data)
-    
+    df = df.append(df_prob, ignore_index=True)
+
     # current date and time as a string
     timestamp = datetime.now().strftime('%Y%m%d%H%M')
-    excel_file = f"exectest_{timestamp}.xlsx"  # dynamic Excel file name
+    excel_file = f"exectest_{timestamp}_final.xlsx"  # dynamic Excel file name
     df.to_excel(excel_file, index=False)
     print(f"Final data saved to {excel_file}")
