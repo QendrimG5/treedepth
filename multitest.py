@@ -77,7 +77,7 @@ def process_instance(new_start_instance_index):
 
     return {"Instance": instance_name, **{f"Execution {i+1}": result for i, result in enumerate(results)}}
 
-node_type_selection_probability = {'subtree': 0, 'internal': 10, 'leaf': 10, 'leafs': 10, 'root': 10,
+node_type_selection_probability = {'subtree': 10, 'internal': 0, 'leaf': 10, 'leafs': 10, 'root': 10,
                                    'top': 10, 'bottom': 10, 'level': 10, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
 
 new_instance_type = 'heur'
