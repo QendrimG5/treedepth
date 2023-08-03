@@ -9,7 +9,7 @@ import signal
 import time
 
 # Problem related parameters
-node_type_selection_probability = {'subtree': 10, 'internal': 10, 'leaf': 10, 'leafs': 0, 'root': 10,'top': 10, 'bottom': 10, 'level': 10, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
+node_type_selection_probability = {'subtree': 10, 'internal': 10, 'leaf': 10, 'leafs': 10, 'root': 0,'top': 10, 'bottom': 10, 'level': 10, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
 random_walk_limit = 0.9
 sub_tree_size_probability = 0.8
 top_max_limit_probability = 0.8
