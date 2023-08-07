@@ -78,7 +78,7 @@ def process_instance(new_start_instance_index):
     return {"Instance": instance_name, **{f"Execution {i+1}": result for i, result in enumerate(results)}}
 
 node_type_selection_probability = {'subtree': 10, 'internal': 10, 'leaf': 10, 'leafs': 10, 'root': 10,
-                                   'top': 10, 'bottom': 0, 'level': 10, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
+                                   'top': 10, 'bottom': 10, 'level': 0, 'path': 10, 'partial_path': 10, 'partial_path_bottom': 10}
 
 new_instance_type = 'heur'
 
@@ -125,6 +125,6 @@ finally:
 
     # current date and time as a string
     timestamp = datetime.now().strftime('%Y%m%d%H%M')
-    excel_file = f"exectest_{timestamp}_bottom_final.xlsx"  # dynamic Excel file name
+    excel_file = f"exectest_{timestamp}_level_final.xlsx"  # dynamic Excel file name
     df.to_excel(excel_file, index=False)
     print(f"Final data saved to {excel_file}")
